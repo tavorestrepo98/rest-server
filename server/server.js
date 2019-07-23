@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/usuario', require('./routes/usuarios.routes'));
 
 
-URI = 'mongodb+srv://TavoDB:1798@cluster0-lnxd1.mongodb.net/cafe'
+URI = process.env.Mongo_URI;
 
 mongoose.connect(URI, { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false })
     .then(db => console.log('Conectado a la base de Datos'))
