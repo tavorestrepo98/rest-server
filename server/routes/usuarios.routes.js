@@ -4,11 +4,23 @@ const Usuario = require('../models/usuario');
 const bcrypt = require('bcrypt');
 const _ = require('underscore');
 
+router.get('/:id', async(req, res) => {
+    let id = req.params.id;
+    let user = await Usuario.find({ _id: id, estado: true }, 'nombre email role estado');
+
+    res.json({
+        ok: true,
+        usuario: user
+    });
+
+
+});
+
 
 router.get('/', (req, res) => {
     let desde = parseInt(req.query.desde) || 0;
     let limite = parseInt(req.query.limite) || 5;
-    Usuario.find({}, 'nombre email role estado')
+    Usuario.find({ estado: true }, 'nombre email role estado')
         .skip(desde)
         .limit(limite)
         .exec((err, usuarios) => {
@@ -19,7 +31,7 @@ router.get('/', (req, res) => {
                 });
             }
 
-            Usuario.countDocuments({}, (err, conteo) => {
+            Usuario.countDocuments({ estado: true }, (err, conteo) => {
                 res.json({
                     ok: true,
                     cuantos: conteo,
@@ -75,10 +87,46 @@ router.put('/:id', (req, res) => {
     });
 });
 
-router.delete('/', (req, res) => {
-    res.json({
-        menssage: 'delete usuario'
+router.delete('/:id', (req, res) => {
+    let id = req.params.id;
+    Usuario.findByIdAndUpdate(id, { estado: false }, { new: true, runValidators: true }, (err, usuarioBorrado) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                err
+            });
+        }
+        usuarioBorrado.password = null;
+
+        res.json({
+            ok: true,
+            usuario: usuarioBorrado
+        })
     });
+
+    // Usuario.findByIdAndRemove(id, (err, usuarioBorrado) => {
+    //     if (err) {
+    //         return res.status(400).json({
+    //             ok: false,
+    //             err
+    //         });
+    //     }
+
+    //     if (usuarioBorrado == null) {
+    //         return res.status(400).json({
+    //             ok: false,
+    //             err: {
+    //                 message: 'usuario no encontrado'
+    //             }
+    //         });
+    //     }
+
+    //     res.json({
+    //         ok: true,
+    //         usuario: usuarioBorrado
+    //     });
+    // });
+
 });
 
 
