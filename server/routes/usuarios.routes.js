@@ -8,7 +8,7 @@ const _ = require('underscore');
 router.get('/', (req, res) => {
     let desde = parseInt(req.query.desde) || 0;
     let limite = parseInt(req.query.limite) || 5;
-    Usuario.find({})
+    Usuario.find({}, 'nombre email role estado')
         .skip(desde)
         .limit(limite)
         .exec((err, usuarios) => {
@@ -18,11 +18,17 @@ router.get('/', (req, res) => {
                     err
                 });
             }
-            res.json({
-                ok: true,
-                usuarios
+
+            Usuario.countDocuments({}, (err, conteo) => {
+                res.json({
+                    ok: true,
+                    cuantos: conteo,
+                    usuarios
+                });
+
             });
-        })
+
+        });
 });
 
 router.post('/', (req, res) => {
