@@ -1,7 +1,9 @@
 require('./config/config');
 
 const express = require('express');
+const mongoose = require('mongoose');
 const app = express();
+const morgan = require('morgan');
 
 const port = process.env.PORT;
 
@@ -9,37 +11,17 @@ const port = process.env.PORT;
 //middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(morgan('dev'));
 
-app.get('/usuario', (req, res) => {
-    res.json({
-        menssage: 'get usuario'
-    });
-});
+//Rutas
+app.use('/usuario', require('./routes/usuarios.routes'));
 
-app.post('/usuario', (req, res) => {
-    let body = req.body;
-    if (body.nombre == undefined) {
-        res.status(400).json({
-            ok: false,
-            menssage: "Nombre es necesario"
-        });
-    } else {
-        res.json({ persona: body });
-    }
-});
+URI = 'mongodb://localhost:27017/cafe'
 
-app.put('/usuario/:id', (req, res) => {
-    let id = req.params.id;
-    res.json({
-        id
-    });
-});
+mongoose.connect(URI, { useNewUrlParser: true, useCreateIndex: true, useFindAndModify: false })
+    .then(db => console.log('Conectado a la base de Datos'))
+    .catch(err => console.log({ err }))
 
-app.delete('/usuario', (req, res) => {
-    res.json({
-        menssage: 'delete usuario'
-    });
-});
 
 app.listen(port, () => {
     console.log(`Escuchando puerto ${port}`);
