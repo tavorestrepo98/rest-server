@@ -13,8 +13,6 @@ router.get('/:id', async(req, res) => {
         ok: true,
         usuario: user
     });
-
-
 });
 
 
